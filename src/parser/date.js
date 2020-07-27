@@ -14,8 +14,7 @@ const {
 
 const { namedProp, mergeProps } = require("./util");
 
-const period = char(".");
-const afterPeriod = (parserFn) => takeRight(period)(parserFn);
+const delimiter = sequenceOf([char("."), optionalWhitespace]);
 
 const monthAliases = [
   "JAN January Januar",
@@ -29,8 +28,8 @@ const monthNames = choice(
   )
 );
 
-const dayOfMonth = takeLeft(digits)(period);
-const monthOfYear = takeLeft(choice([monthNames, digits]))(period);
+const dayOfMonth = takeLeft(digits)(delimiter);
+const monthOfYear = takeLeft(choice([monthNames, digits]))(delimiter);
 const year = digits;
 
 const date = pipeParsers([
@@ -42,7 +41,7 @@ const date = pipeParsers([
   mapTo(mergeProps),
 ]);
 
-const dateDelimiters = sequenceOf([
+const rangeDelimiter = sequenceOf([
   optionalWhitespace,
   choice([char("-"), char("—"), str("bis")]),
   optionalWhitespace,
@@ -51,7 +50,7 @@ const dateDelimiters = sequenceOf([
 const dateRange = pipeParsers([
   sequenceOf([
     namedProp("from", date),
-    namedProp("to", takeRight(dateDelimiters)(date)),
+    namedProp("to", takeRight(rangeDelimiter)(date)),
   ]),
   mapTo(mergeProps),
 ]);

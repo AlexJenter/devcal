@@ -1,19 +1,17 @@
 const {
   possibly,
   takeLeft,
-  sepBy,
   char,
   pipeParsers,
   mapTo,
-  choice,
   sequenceOf,
   optionalWhitespace,
 } = require("arcsecond");
 
-const { mergeProps, optionalMergeProps } = require("./util");
+const { optionalMergeProps } = require("./util");
 const time = require("./time");
 const date = require("./date");
-const { location, words, notes, url, propsParser } = require("./props");
+const propsParser = require("./props");
 
 const comma = char(",");
 const eventDelim = sequenceOf([comma, optionalWhitespace]);

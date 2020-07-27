@@ -13,7 +13,6 @@ const {
   letters,
   possibly,
   anyOfString,
-  sepBy1,
 } = require("arcsecond");
 
 const { namedProp, mergeProps, commaSeparated } = require("./util");
@@ -47,7 +46,7 @@ const url = pipeParsers([
   mapTo((x) => x.join("")),
 ]);
 
-const propsParser = pipeParsers([
+module.exports = pipeParsers([
   commaSeparated(
     choice([
       namedProp("notes", notes),
@@ -58,11 +57,3 @@ const propsParser = pipeParsers([
   ),
   mapTo(mergeProps),
 ]);
-
-module.exports = {
-  location,
-  notes,
-  words,
-  url,
-  propsParser,
-};
