@@ -1,4 +1,11 @@
-const { pipeParsers, mapTo } = require("arcsecond");
+const {
+  pipeParsers,
+  mapTo,
+  sepBy1,
+  sequenceOf,
+  char,
+  optionalWhitespace,
+} = require("arcsecond");
 
 const namedProp = (name, parserFn) =>
   pipeParsers([
@@ -8,9 +15,15 @@ const namedProp = (name, parserFn) =>
     })),
   ]);
 
-const mergeProps = (prop) => prop.reduce((acc, x) => ({ ...acc, ...x }), {});
+const mergeProps = (arr) => arr.reduce((acc, x) => ({ ...acc, ...x }), {});
+const optionalMergeProps = (arr) =>
+  arr.reduce((acc, x) => (x ? { ...acc, ...x } : acc), {});
+
+const commaSeparated = sepBy1(sequenceOf([char(","), optionalWhitespace]));
 
 module.exports = {
   namedProp,
   mergeProps,
+  commaSeparated,
+  optionalMergeProps,
 };

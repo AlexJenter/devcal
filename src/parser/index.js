@@ -1,32 +1,30 @@
 const {
-  namedSequenceOf,
   possibly,
   takeLeft,
-  str,
   sepBy,
-  letters,
   char,
   pipeParsers,
   mapTo,
   choice,
   sequenceOf,
   optionalWhitespace,
-  letter,
-  many,
-  takeRight,
-  anyOfString,
 } = require("arcsecond");
 
+const { mergeProps, optionalMergeProps } = require("./util");
 const time = require("./time");
 const date = require("./date");
-const { mergeProps } = require("./util");
-const { location, words, notes, url } = require("./props");
+const { location, words, notes, url, propsParser } = require("./props");
+
+const comma = char(",");
+const eventDelim = sequenceOf([comma, optionalWhitespace]);
 
 const parser2 = pipeParsers([
-  sepBy(sequenceOf([char(","), optionalWhitespace]))(
-    choice([date, time, notes, location, url, words])
-  ),
-  mapTo(mergeProps),
+  sequenceOf([
+    takeLeft(date)(eventDelim),
+    possibly(takeLeft(time)(eventDelim)),
+    propsParser,
+  ]),
+  mapTo(optionalMergeProps),
 ]);
 
 module.exports = parser2;

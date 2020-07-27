@@ -13,26 +13,26 @@ const {
   letters,
   possibly,
   anyOfString,
+  sepBy1,
 } = require("arcsecond");
+
+const { namedProp, mergeProps, commaSeparated } = require("./util");
 
 const words = pipeParsers([
   sepBy(char(" "))(letters),
-  mapTo((x) => ({ words: x.join(" ") })),
+  mapTo((s) => s.join(" ")),
 ]);
 
-const notes = pipeParsers([
-  takeRight(sequenceOf([str("notes:"), optionalWhitespace]))(
-    many(choice([letter, anyOfString("' ")]))
-  ),
-  mapTo((x) => ({ notes: x.join("") })),
-]);
+const prop = (name) =>
+  pipeParsers([
+    takeRight(sequenceOf([str(name), optionalWhitespace]))(
+      many(choice([letter, anyOfString("' ")]))
+    ),
+    mapTo((x) => x.join("")),
+  ]);
 
-const location = pipeParsers([
-  takeRight(sequenceOf([str("location:"), optionalWhitespace]))(
-    many(choice([letter, anyOfString("' ")]))
-  ),
-  mapTo((x) => ({ location: x.join("") })),
-]);
+const notes = prop("notes:");
+const location = prop("location:");
 
 const url = pipeParsers([
   sequenceOf([
@@ -44,7 +44,19 @@ const url = pipeParsers([
       mapTo((x) => x.join("")),
     ]),
   ]),
-  mapTo((x) => ({ url: x.join("") })),
+  mapTo((x) => x.join("")),
+]);
+
+const propsParser = pipeParsers([
+  commaSeparated(
+    choice([
+      namedProp("notes", notes),
+      namedProp("location", location),
+      namedProp("url", url),
+      namedProp("words", words),
+    ])
+  ),
+  mapTo(mergeProps),
 ]);
 
 module.exports = {
@@ -52,4 +64,5 @@ module.exports = {
   notes,
   words,
   url,
+  propsParser,
 };
