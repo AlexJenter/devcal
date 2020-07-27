@@ -1,6 +1,6 @@
 const parser = require("./parser");
 
-const input = "16:00–17:00";
+const input = ["23.02.2000 - 1.3.2026", "23.2. - 1.3.2026", "23. - 25.2.2026"];
 
 const handleError = (error, parsingState) => {
   const e = new Error(error);
@@ -13,6 +13,8 @@ const handleSuccess = (result, parsingState) => {
   return result;
 };
 
-const parsingResult = parser.fork(input, handleError, handleSuccess);
+const parsingResult = input.map((test) =>
+  parser.fork(test, handleError, handleSuccess)
+);
 
 console.log(parsingResult);

@@ -8,6 +8,10 @@ const {
   sequenceOf,
   str,
   takeRight,
+  optionalWhitespace,
+  many1,
+  digit,
+  takeLeft,
 } = require("arcsecond");
 
 const monthAliases = [
@@ -26,13 +30,25 @@ const time = sequenceOf([digits, takeRight(char(":"))(digits)]);
 const timeDelimiters = choice([char("-"), char("—"), char("–")]);
 const timeRange = sequenceOf([time, takeRight(timeDelimiters)(time)]);
 
-const afterPeriod = (parserFn) => takeRight(char("."))(parserFn);
+const period = char(".");
+const afterPeriod = (parserFn) => takeRight(period)(parserFn);
+
+const dayOfMonth = takeLeft(digits)(period);
+const monthOfYear = takeLeft(digits)(period);
+const year = digits;
 
 const date = choice([
-  sepBy(char("."))(digits),
-  sequenceOf([digits, afterPeriod(monthNames), afterPeriod(digits)]),
+  sequenceOf([dayOfMonth, monthOfYear, year]),
+  sequenceOf([dayOfMonth, monthOfYear]),
+  dayOfMonth,
 ]);
+const dateDelimiters = sequenceOf([
+  optionalWhitespace,
+  choice([char("-"), char("—"), str("bis")]),
+  optionalWhitespace,
+]);
+const dateRange = sequenceOf([date, takeRight(dateDelimiters)(date)]);
 
-const parser = timeRange;
+const parser = dateRange;
 
 module.exports = parser;
