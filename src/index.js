@@ -1,6 +1,6 @@
 const parser = require("./parser");
 
-const input = "23.JAN.2026, 16:00–17:00, Time Event";
+const input = "16:00–17:00";
 
 const handleError = (error, parsingState) => {
   const e = new Error(error);

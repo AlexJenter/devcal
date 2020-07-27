@@ -22,15 +22,17 @@ const monthNames = choice(
   )
 );
 
-const dateParser = choice([
+const time = sequenceOf([digits, takeRight(char(":"))(digits)]);
+const timeDelimiters = choice([char("-"), char("—"), char("–")]);
+const timeRange = sequenceOf([time, takeRight(timeDelimiters)(time)]);
+
+const afterPeriod = (parserFn) => takeRight(char("."))(parserFn);
+
+const date = choice([
   sepBy(char("."))(digits),
-  sequenceOf([
-    digits,
-    takeRight(char("."))(monthNames),
-    takeRight(char("."))(digits),
-  ]),
+  sequenceOf([digits, afterPeriod(monthNames), afterPeriod(digits)]),
 ]);
 
-const parser = dateParser;
+const parser = timeRange;
 
 module.exports = parser;
