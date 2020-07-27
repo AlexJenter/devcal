@@ -16,7 +16,7 @@ const propsParser = require("./props");
 const comma = char(",");
 const eventDelim = sequenceOf([comma, optionalWhitespace]);
 
-const parser2 = pipeParsers([
+const parser = pipeParsers([
   sequenceOf([
     takeLeft(date)(eventDelim),
     possibly(takeLeft(time)(eventDelim)),
@@ -25,4 +25,12 @@ const parser2 = pipeParsers([
   mapTo(optionalMergeProps),
 ]);
 
-module.exports = parser2;
+const handleError = (error, parsingState) => {
+  const e = new Error(error);
+  e.parsingState = parsingState;
+  throw e;
+};
+
+const handleSuccess = (result) => result;
+
+module.exports = (source) => parser.fork(source, handleError, handleSuccess);
